@@ -17,14 +17,15 @@
 // Snow fall speed, milliseconds per row
 #define FALL_SPEED 1000
 // Tick size, milliseconds
-#define TICK_SIZE 100
-#define TICK_JITTER 150
+#define TICK_SIZE 200
+#define TICK_JITTER 300
 
 // Probability of precipitation
 #define POP 5
 
 // Define the array of leds
 CRGB leds[NUM_LEDS];
+CRGB targetColour;
 BitArray snow;
 
 int columnStart[NUM_STRIPS];
@@ -38,8 +39,9 @@ void setup() {
   // Initialize FASTLED
   Serial.begin(9600);
   Serial.println("resetting");
-  LEDS.addLeds<WS2812,DATA_PIN,GRB>(leds,NUM_LEDS);
+  LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
   LEDS.setBrightness(128);
+  targetColour = CHSV(45,80,255);
   
   snow.begin(1, 450);
   
@@ -146,7 +148,7 @@ void render() {
       Serial.print("\n");
   */    
 
-      leds[i] = CHSV(HUE_ORANGE,70,random(220,255));
+      leds[i] = CHSV(170,255,random(220,255));
     }
     else {
       leds[i].nscale8(205);

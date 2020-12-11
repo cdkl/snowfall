@@ -24,9 +24,19 @@ CRGB leds[NUM_LEDS];
 int columnStart[NUM_STRIPS];
 bool columnReverse[NUM_STRIPS];
 
-int lightPosition[NUM_LIGHTS];
-byte lightColour[NUM_LIGHTS];
-byte lightTime[NUM_LIGHTS];
+enum light_type {
+  NORMAL,
+  NOVA
+};
+
+struct light {
+  int pos;
+  byte colour;
+  byte time;
+  light_type type;
+};
+
+light lights[NUM_LIGHTS];
 
 void setup() { 
 
@@ -69,7 +79,7 @@ void setup() {
 
   for(int i = 0; i < NUM_LIGHTS; ++i) {
     createNewLight(i);
-    lightTime[i] = random8();
+    lights[i].time = random8();
   }
 }
 
@@ -77,11 +87,11 @@ void loop() {
   // Shuffle the snowflakes
   for(int i = 0; i < NUM_LIGHTS; ++i) {
     int tickIncr = TICK_SIZE + random(0, TICK_SIZE);
-    if( tickIncr + lightTime[i] > 255) {
+    if( tickIncr + lights[i].time > 255) {
       // regen light
       createNewLight(i);
     }
-    lightTime[i] += tickIncr;
+    lights[i].time += tickIncr;
   }
   
   render();
@@ -92,8 +102,15 @@ void loop() {
 }
 
 void createNewLight(int i) {
-  lightColour[i] = random8(0,4);
-  lightPosition[i] = random16(0, NUM_LEDS);
+  lights[i].colour = random8(0,4);
+  lights[i].pos = random16(0, NUM_LEDS);
+  int rnd = random16(0,1000);
+  if(rnd >= 990) {
+    lights[i].type = NORMAL;
+  }
+  else {
+    lights[i].type = NOVA;
+  }
 }
 
 /*
@@ -131,25 +148,36 @@ void render() {
 
   // trigger active
   for(int i = 0; i < NUM_LIGHTS; ++i) {
-    int index = lightPosition[i];
-    CRGB target;
-    switch(lightColour[i]) {
-      case 0:
-        target = CRGB::Red;
-        break;
-      case 1:
-        target = CRGB::Green;
-        break;
-      case 2:
-        target = CRGB::Blue;
-        break;
-      case 3:
-        target = CRGB::Yellow;
-        break;
+    if( lights[i].type == NORMAL ) {
+      drawLight(lights[i]);
+
     }
-    for(int j = 0; j < 3; ++j ) {
-      leds[lightPosition[i]][j] = lerp8by8(leds[lightPosition[i]][j], target[j], 5);
+    else {
+      // NOVA
     }
     
   }
+}
+
+void drawLight( const light& thisLight ) { 
+  int index = thisLight.pos;
+  CRGB target;
+  switch(thisLight.colour) {
+    case 0:
+      target = CRGB::Red;
+      break;
+    case 1:
+      target = CRGB::Green;
+      break;
+    case 2:
+      target = CRGB::Blue;
+      break;
+    case 3:
+      target = CRGB::Yellow;
+      break;
+  }
+  for(int j = 0; j < 3; ++j ) {
+    leds[thisLight.pos][j] = lerp8by8(leds[thisLight.pos][j], target[j], 5);
+  }
+
 }

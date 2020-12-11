@@ -21,7 +21,7 @@
 #define TICK_JITTER 150
 
 // Probability of precipitation
-#define POP 5
+#define POP 15
 
 // Define the array of leds
 CRGB leds[NUM_LEDS];
@@ -146,7 +146,7 @@ void render() {
       Serial.print("\n");
   */    
 
-      leds[i] = CHSV(HUE_ORANGE,70,random(220,255));
+      leds[i] = CHSV(HUE_GREEN,255,random(220,255));
     }
     else {
       leds[i].nscale8(205);
